@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sirfitech dApp</title>
+    <style>
+        h1 {
+            color: #8d021f;
+            align-self: center;
+        }
+        
+        div {
+            background-color: aliceblue;
+            width: 50%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            border-radius: 5px;
+        }
+        
+        body {
+            background-image: image(src="");
+        }
+        
+        button {
+            width: 100%;
+            margin: 10px 0px 5px 0px;
+            height: 40%;
+            border-radius: 5px;
+            background-color: #8d021f;
+            color: aliceblue;
+        }
+        
+        input {
+            margin: 10px 0px 5px 0px;
+        }
+        
+        label {
+            align-self: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Sirfitech dApp</h1>
+        <p>Recording who is presewnt on the Goerli Ethereum Testnet</p>
+        <!--
+        <p id="update-records"></p>
+        <p id="show-records"></p>
+        -->
+        <label for="record">Record Your Name: </label>
+        <input type="Text" placeholder="Enter your name" id="update-records" />
+        <button onclick="updateRecord()"> Update Record</button>
+        <button onclick="showRecord()"> Show Record</button>
+
+        <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+        <script>
+            // declaring the variables I would be using
+
+
+            const SirfitechRecordContractAddress = "0xDD3f9668008A07fCa87f1884A096723CF268Ff5B";
+            const SirfitechRecordContractABI = [{
+                "inputs": [{
+                    "internalType": "string",
+                    "name": "_record",
+                    "type": "string"
+                }],
+                "name": "updateRecord",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }, {
+                "inputs": [],
+                "name": "showRecord",
+                "outputs": [{
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }],
+                "stateMutability": "view",
+                "type": "function"
+            }];
+            let SirfitechRecordContract;
+            let signer;
+            const provider = new ethers.providers.Web3Provider(window.ethereum, "goerli");
+            provider.send("eth_requestAccounts", []).then(() => {
+                provider.listAccounts().then((accounts) => {
+                    signer = provider.getSigner(accounts[0]);
+                    SirfitechRecordContract = new ethers.Contract(
+                        SirfitechRecordContractAddress,
+                        SirfitechRecordContractABI,
+                        signer,
+                    );
+                })
+            })
+
+
+
+            async function updateRecord() {
+                
+                const updateRecordPromise = SirfitechRecordContract.updateRecord();
+                var newRecord = await updateRecordPromise;
+                document.getElementById("update-records").innerHTML = `${newRecord} you are welcome`;
+                console.log(newRecord);
+            }
+
+            async function showRecord() {
+                const record = document.getElementById("update-records").value;
+                const showRecordPromise = SirfitechRecordContract.showRecord(record);
+                await showRecordPromise;
+            }
+        </script>
+
+
+    </div>
+</body>
+
+</html>
